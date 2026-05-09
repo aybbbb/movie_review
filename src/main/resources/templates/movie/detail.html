@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="ko" translate="no" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{_fragments/_head :: my-head(${movie.title})}" />
+
+    <style>
+    .star {
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .star:hover {
+        transform: scale(1.2);
+    }
+    </style>
+</head>
+<body class="bg-dark text-white">
+
+    <th:block th:replace="~{_fragments/header :: my-header}" />
+
+    <div class="container py-5">
+
+        <div class="row g-5">
+
+            <!-- 포스터 -->
+            <div class="col-md-4">
+                <img th:src="${movie.poster != 'N/A' ? movie.poster : 'https://via.placeholder.com/400x600?text=No+Image'}"
+                     class="movie-poster shadow"  alt="영화 포스터">
+            </div>
+
+            <!-- 영화 정보 -->
+            <div class="col-md-8">
+
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 class="fw-bold mb-2" th:text="${movie.title}">영화 제목</h2>
+
+                        <p class="text-secondary mb-1">
+                            <span th:text="${movie.year}">2024</span>
+                            ·
+                            <span th:text="${movie.runtime}">120 min</span>
+                            ·
+                            <span th:text="${movie.genre}">Action</span>
+                        </p>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        
+                        <div class="btn btn-warning rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2" style="cursor: default;">
+                            <i class="bi bi-star-fill fs-6 text-dark"></i>
+                            <span class="small fw-semibold text-dark" th:text="${ratingAvg}">8.5</span>
+                        </div>
+
+                        <!-- 위시 -->
+                        <button type="button" id="wish-btn"
+                                class="btn btn-dark border-secondary rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2">
+                            <i class="bi bi-heart fs-6 text-white"></i>
+                            <span class="small text-white">Wish</span>
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="border-secondary">
+
+                <div class="mb-3">
+                    <strong>감독</strong>
+                    <p class="text-secondary mb-0" th:text="${movie.director}">감독명</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>배우</strong>
+                    <p class="text-secondary mb-0" th:text="${movie.actors}">배우명</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>개봉일</strong>
+                    <p class="text-secondary mb-0" th:text="${movie.released}">01 Jan 2024</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>국가</strong>
+                    <p class="text-secondary mb-0" th:text="${movie.country}">USA</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>줄거리</strong>
+                    <p class="text-secondary mb-0" th:text="${movie.plot}">
+                        줄거리 내용
+                    </p>
+                </div>
+
+            </div>
+            <div class="text-center mt-4">
+                <a th:href="@{/}"  class="btn btn-sm btn-outline-light px-4">목록가기</a>
+            </div>
+        </div>
+       
+        <!-- 리뷰 영역 -->
+        <div id="review-list" class="mt-5">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">리뷰</h3>
+
+                <button class="btn btn-warning" id="toggle-form">리뷰 작성</button>
+            </div>
+
+            <div th:if="${reviewList == null or #lists.isEmpty(reviewList)}"
+                 class="text-center py-5 border rounded border-secondary">
+
+                <h5 class="text-secondary">아직 등록된 리뷰가 없습니다.</h5>
+            </div>
+        
+            <div class="col-12" th:each="review : ${reviewList}">
+                <div class="card bg-secondary-subtle text-dark review-card shadow-sm border-0">
+                    <div class="card-body">
+                        <!-- 상단 -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <strong class="fs-6" th:text="${review.writer}">
+                                작성자
+                            </strong>
+                            <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                                ⭐ <span th:text="${review.rating}">5</span>
+                            </span>
+                        </div>
+
+                        <!-- 사진 있는 리뷰 -->
+                        <div th:if="${review.photoReview != null and review.photoReview != ''}">
+                            <div class="row g-3 align-items-start mb-3">
+                                <!-- 이미지 -->
+                                <div class="col-md-4">
+                                    <img th:src="@{|/files${review.photoReview}|}"
+                                        class="img-fluid rounded shadow-sm border w-100"
+                                        style="max-height: 220px; object-fit: contain;"
+                                        alt="리뷰 인증샷">
+                                </div>
+
+                                <!-- 감상평 -->
+                                <div class="col-md-8 d-flex align-items-center">
+                                    <p class="mb-0 fs-6 lh-lg" th:text="${review.textReview}">
+                                        리뷰 내용
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- 사진 없는 리뷰 -->
+                        <div th:if="${review.photoReview == null or review.photoReview == ''}">
+                            <p class="mb-3 fs-6 lh-lg" th:text="${review.textReview}">
+                                리뷰 내용
+                            </p>
+                        </div>
+
+                        <!-- 하단 -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted" th:text="${review.regDate}">
+                                2026-04-18
+                            </small>
+                            <!-- 본인 리뷰일 때만 노출 -->
+                            <div th:if="${session.memberInfo != null and session.memberInfo.id == review.memId}">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary me-1 edit-btn"
+                                        th:data-id="${review.id}">
+                                    수정
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger delete-btn"
+                                        th:data-id="${review.id}">
+                                    삭제
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 수정 폼 -->
+                        <div class="edit-form mt-3 border-top pt-3" th:id="'edit-form-' + ${review.id}" style="display:none;">
+
+                            <form class="review-edit-form" enctype="multipart/form-data">
+                                <input type="hidden" name="id" th:value="${review.id}">
+                                <input type="hidden" name="movie_id" th:value="${review.movieId}">
+                                <input type="hidden" name="mem_id" th:value="${review.memId}">
+
+                                <!-- 새 사진 -->
+                                <div class="mb-3">
+                                    <label class="form-label">새 사진 변경</label>
+                                    <input type="file" name="photo_review_upt" class="form-control"accept="image/*">
+                                </div>
+                                <!-- 별점 -->
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="form-label mb-0">별점</label>
+
+                                        <div class="edit-star-rating d-flex gap-1 fs-4">
+                                            <span class="edit-star"
+                                                th:data-review-id="${review.id}"
+                                                data-value="1">☆</span>
+                                            <span class="edit-star"
+                                                th:data-review-id="${review.id}"
+                                                data-value="2">☆</span>
+                                            <span class="edit-star"
+                                                th:data-review-id="${review.id}"
+                                                data-value="3">☆</span>
+                                            <span class="edit-star"
+                                                th:data-review-id="${review.id}"
+                                                data-value="4">☆</span>
+                                            <span class="edit-star"
+                                                th:data-review-id="${review.id}"
+                                                data-value="5">☆</span>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="rating_upt" th:id="'edit-rating-' + ${review.id}" th:value="${review.rating}">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">내용 수정</label>
+                                    <textarea class="form-control edit-textarea" name="text_review_upt" rows="3"
+                                            th:text="${review.textReview}"></textarea>
+
+                                    <div class="d-flex justify-content-end mt-1">
+                                        <small class="text-secondary">
+                                            <span class="edit-char-count" th:text="${#strings.length(review.textReview)}">0</span> / 300
+                                        </small>
+                                    </div>
+                                </div>
+
+                               <div class="d-flex justify-content-center gap-2 mt-3">
+                                    <button type="submit" class="btn btn-sm btn-warning px-4">
+                                        수정
+                                    </button>
+
+                                    <button type="button" class="btn btn-sm btn-secondary cancel-edit px-4">
+                                        취소
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 리뷰 작성 폼 -->
+        <div id="review-form" style="display:none;" class="mt-3">
+
+            <form id="enroll" enctype="multipart/form-data">
+                <input type="hidden" name ="mem_id" th:value="${session.memberInfo != null ? session.memberInfo.id : ''}">
+                <input type="hidden" name ="movie_id" th:value="${movie.imdbID}">
+                <!-- 이미지 -->
+                <div class="mb-2">
+                    <label class="form-label">인증샷</label>
+                    <input type="file" class="form-control" id="photo_review" name="photo_review" accept="image/*">
+                </div>
+
+               <div class="mb-2 d-flex align-items-center gap-2">
+                    <label class="form-label mb-0">별점</label>
+                    <div id="star-rating" class="d-flex gap-1 fs-4">
+                        <span class="star" data-value="1">☆</span>
+                        <span class="star" data-value="2">☆</span>
+                        <span class="star" data-value="3">☆</span>
+                        <span class="star" data-value="4">☆</span>
+                        <span class="star" data-value="5">☆</span>
+                    </div>
+                    <input type="hidden" id="rating" name="rating" value="0">
+                </div>
+                
+                <div class="mb-2">
+                    <label class="form-label">내용</label>
+                    <textarea class="form-control" id="text_review" name="text_review"  maxlength="300"></textarea>
+                    
+                    <!-- 글자수 -->
+                    <div class="d-flex justify-content-end mt-1">
+                        <small class="text-secondary">
+                            <span id="char-count">0</span> / 300
+                        </small>
+                    </div>
+                </div>
+                
+                
+
+                <!-- 작성자 -->
+               <div class="d-flex justify-content-end mb-2">
+                    <span class="badge bg-secondary-subtle text-dark px-3 py-2 rounded-pill shadow-sm">
+                        작성자 :
+                        <b th:text="${session.memberInfo != null ? session.memberInfo.userName : ''}"></b>
+                    </span>
+                </div>
+
+                <button type="submit" class="btn btn-warning w-100">
+                    등록
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <th:block th:replace="~{_fragments/footer :: my-footer}" />
+    <th:block th:replace="~{_fragments/_scripts :: my-scripts}" />
+    <script th:inline="javascript">
+        const textarea = document.querySelector("#text_review");
+        const counter = document.querySelector("#char-count");
+        const MAX = 300;
+
+        const stars = document.querySelectorAll(".star");
+        const ratingInput = document.querySelector("#rating");
+
+        const movieId = /*[[${movie.imdbID}]]*/ "";
+        let isWished = false;
+
+        document.addEventListener("DOMContentLoaded",async function(){
+            const result = await fetchHelper.get(`/api/wishlist/is_wished?movie_id=${movieId}`);
+            isWished = result.isWished;   
+            console.log(isWished)
+            setWishButton(isWished);
+        });
+        
+
+        textarea.addEventListener("keyup", () => {
+            let value = textarea.value;
+
+            // 300자 초과 시 자르기
+            if (value.length > MAX) {
+                alert("300자 이하로 작성해주세요.");
+                textarea.value = value.substring(0, MAX);
+                value = textarea.value;
+            }
+
+            // 글자수 표시
+            counter.innerText = value.length;
+        });
+
+        stars.forEach(star => {
+            star.addEventListener("click", () => {
+                const value = star.dataset.value;
+                ratingInput.value = value;
+                
+                stars.forEach(s => {
+                    if (s.dataset.value <= value) {
+                        s.textContent = "★";
+                        s.style.color = "#ffc107";
+                    } else {
+                        s.textContent = "☆";
+                        s.style.color = "#ccc";
+                    }
+                });
+            });
+        });
+
+        function setWishButton(isWished) {
+            const wishBtn = document.querySelector("#wish-btn");
+
+            if (isWished) {
+                wishBtn.className = "btn btn-danger rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2";
+                wishBtn.innerHTML = `
+                    <i class="bi bi-heart-fill fs-6 text-white"></i>
+                    <span class="small text-white">Wished</span>
+                `;
+            } else {
+                wishBtn.className = "btn btn-dark border-secondary rounded-pill px-3 py-2 shadow-sm d-flex align-items-center gap-2";
+                wishBtn.innerHTML = `
+                    <i class="bi bi-heart fs-6 text-white"></i>
+                    <span class="small text-white">Wish</span>
+                `;
+            }
+        }
+
+        document.querySelector("#toggle-form").addEventListener("click", async(e)=>{
+            e.preventDefault();
+
+            const isLogin = /*[[${session.memberInfo != null}]]*/ false;
+
+            // 로그인 안된 경우
+            if (!isLogin) {
+
+                const currentUrl = window.location.pathname + window.location.search;
+
+                if (confirm("로그인이 필요합니다. 로그인 하시겠습니까?")) {
+                    window.location = '/account/login?redirect=' + encodeURIComponent(currentUrl);
+                }
+
+                return; 
+            }
+
+            
+            let reviewId = 0
+            try {
+                reviewId = await fetchHelper.get(`/api/movie/my?movie_id=${movieId}`);
+
+                // 이미 작성한 리뷰 있음 → 수정폼 이동
+                if (reviewId > 0 ) {
+                    if(confirm("이미 리뷰를 작성하셨습니다. 수정하시겠습니까?")){
+                        const targetForm = document.querySelector("#edit-form-" + reviewId);
+
+                        document.querySelectorAll(".edit-form").forEach(form => {
+                            form.style.display = "none";
+                        });
+                        targetForm.style.display = "block";
+                        targetForm.scrollIntoView({ behavior: "smooth", block: "center" });
+
+                        return;
+                    }
+                }
+
+                // 리뷰 없으면 작성폼 열기
+                document.querySelector("#review-list").style.display = "none";
+                document.querySelector("#review-form").style.display = "block";
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
+
+            // 로그인된 경우 → 리뷰 작성 화면으로 전환
+            document.querySelector("#review-list").style.display = "none";
+            document.querySelector("#review-form").style.display = "block";
+            // await fetchHelper.get('/api/account/logout');
+
+            // window.location= '[[@{/}]]';
+        });
+
+        // 위시리스트
+        document.querySelector("#wish-btn").addEventListener("click", async(e)=>{
+            const isLogin = /*[[${session.memberInfo != null}]]*/ false;
+
+            // 로그인 안된 경우
+            if (!isLogin) {
+
+                const currentUrl = window.location.pathname + window.location.search;
+
+                if (confirm("로그인이 필요합니다. 로그인 하시겠습니까?")) {
+                    window.location = '/account/login?redirect=' + encodeURIComponent(currentUrl);
+                }
+
+                return; 
+            }
+
+            try {
+               let result;
+
+                if (isWished) {
+                    if (!confirm("위시리스트에서 삭제하시겠습니까?")) return;
+                } else {
+                    if (!confirm("위시리스트에 추가하시겠습니까?")) return;
+                }
+
+                result = await fetchHelper.put(`/api/wishlist/toggle?movie_id=${movieId}`);
+
+                isWished = result.toggleWish;   // 핵심
+                setWishButton(isWished);
+    
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
+        });
+
+        document.querySelector("#enroll").addEventListener("submit", async(e)=>{
+            
+            e.preventDefault();
+            const photo = document.querySelector("#photo_review").value;
+            const content = textarea.value;
+
+            try {
+                //regexHelper.value("#photo_review", "사진을 등록하세요.");
+                regexHelper.value("#text_review", "내용을 입력하세요.");
+            } catch (error) {
+                alert(error.message);
+                error.element.focus();
+                return;
+            }
+            const insertUrl = /*[[@{/api/movie/insert}]]*/ "";
+            try {
+                await fetchHelper.post(insertUrl, new FormData(e.currentTarget));
+                location.reload();
+            } catch (error) {
+                alert(error.message);
+                error.element.focus();
+                return;
+            }
+        });
+
+        // 수정 버튼
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const targetForm = document.querySelector("#edit-form-" + id);
+                const stars = document.querySelectorAll('.edit-star[data-review-id="' + id + '"]' );
+                const starValue = document.querySelector("#edit-rating-" + id).value;
+                
+                // 다른 수정폼 닫기
+                document.querySelectorAll(".edit-form").forEach(form => {
+                    form.style.display = "none";
+                });
+
+                // 현재 클릭한 리뷰 폼만 열기
+                targetForm.style.display = "block";
+
+                // 별표시
+                stars.forEach(s => {
+                    if (s.dataset.value <= starValue) {
+                        s.textContent = "★";
+                        s.style.color = "#ffc107";
+                    } else {
+                        s.textContent = "☆";
+                        s.style.color = "#ccc";
+                    }
+                });
+
+                // 글자수 초기화
+                const textarea = targetForm.querySelector(".edit-textarea");
+                const counter = targetForm.querySelector(".edit-char-count");
+                counter.innerText = textarea.value.length;
+
+            });
+        });
+
+        document.querySelectorAll(".edit-textarea").forEach(textareaUpt => {
+            textareaUpt.addEventListener("keyup", () => {
+                let value = textareaUpt.value;
+
+                if (value.length > MAX) {
+                    textareaUpt.value = value.substring(0, MAX);
+                    value = textareaUpt.value;
+                }
+
+                const counterUpt = textareaUpt.closest(".mb-2").querySelector(".edit-char-count");
+
+                counterUpt.innerText = value.length;
+            });
+        });
+
+        // 수정 취소
+        document.querySelectorAll(".cancel-edit").forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.closest(".edit-form").style.display = "none";
+            });
+        });
+
+        document.querySelectorAll(".edit-star").forEach(star => {
+            star.addEventListener("click", () => {
+                const reviewId = star.dataset.reviewId;
+                const value = star.dataset.value;
+
+                const hiddenInput = document.querySelector("#edit-rating-" + reviewId);
+                hiddenInput.value = value;
+
+                const stars = document.querySelectorAll(
+                    '.edit-star[data-review-id="' + reviewId + '"]'
+                );
+
+                stars.forEach(s => {
+                    if (Number(s.dataset.value) <= Number(value)) {
+                        s.textContent = "★";
+                        s.style.color = "#ffc107";
+                    } else {
+                        s.textContent = "☆";
+                        s.style.color = "#ccc";
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll(".review-edit-form").forEach(form => {
+            form.addEventListener("submit", async(e) => {
+                e.preventDefault();
+
+                try {
+                    await fetchHelper.put( "/api/movie/update", new FormData(form));
+
+                    alert("수정되었습니다.");
+                    location.reload();
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+        });
+
+        document.querySelectorAll(".cancel-edit").forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.closest(".edit-form").style.display = "none";
+            });
+        });
+
+        // 리뷰 삭제
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", async() => {
+                const id = btn.dataset.id;
+
+                if (!confirm("리뷰를 삭제하시겠습니까?")) {
+                    return;
+                }
+
+                try {
+                    await fetchHelper.put("/api/movie/del/" + id);
+                    alert("삭제되었습니다.");
+                    location.reload();
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

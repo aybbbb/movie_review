@@ -1,0 +1,67 @@
+<th:block th:fragment="my-header">
+    <!--로딩바-->
+    <!--<img th:src="@{/assets/img/loading.gif}" id="loader"/>-->
+    <header class="p-3 bg-dark text-white">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg>
+                </a>
+
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="#" class="nav-link px-2 text-secondary">Home</a></li>
+                <li><a href="#" class="nav-link px-2 text-white">Features</a></li>
+                <li><a href="#" class="nav-link px-2 text-white">Pricing</a></li>
+                <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
+                <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+                </ul>
+
+                
+
+                <div class="text-end" th:if="${session.memberInfo == null}">
+                    <a th:href="@{/account/login}" class="btn btn-outline-light me-2">로그인</a>
+                    <a th:href="@{/account/join}" class="btn btn-warning">회원가입</a>
+                </div>
+                <div class="text-end" th:unless="${session.memberInfo == null}">
+
+                    <div class="dropdown d-inline-block">
+                        
+                        <!-- 이름 -->
+                        <span class="user-name dropdown-toggle" data-bs-toggle="dropdown"  style="cursor:pointer;">
+                            <span th:text="${session.memberInfo.userName} + '님 환영합니다.'"></span>
+                        </span>
+
+                        <!-- 드롭다운 -->
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/account/edit}">회원정보 수정</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/account/out}">탈퇴</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" id="logout-link">로그아웃</a>
+                            </li>
+                        </ul>
+
+                    </div>
+
+                </div>
+                <script>
+                    document.querySelector("#logout-link").addEventListener("click", async(e)=>{
+                        e.preventDefault();
+
+                        if(!confirm("로그아웃 하시겠습니까?")){
+                            return;
+                        }
+
+                        await fetchHelper.get('/api/account/logout');
+
+                        window.location= '[[@{/}]]';
+                    })
+                </script>
+            </div>
+        </div>
+  </header>
+</th:block>

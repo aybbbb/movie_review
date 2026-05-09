@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko" translate="no" xmlns:th="http://www.thymeleaf.org" >
+    <head>
+        <th:block th:replace="~{_fragments/_head :: my-head('Movie Review')}" />
+    </head>
+    <body class="bg-dark text-white">
+        <th:block th:replace="~{_fragments/header :: my-header}" />
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+
+            <div class="w-100" style="max-width: 420px;">
+
+                <div class="bg-secondary p-4 rounded-4 shadow text-center">
+
+                    <!-- 타이틀 -->
+                    <h4 class="mb-3 text-warning fw-bold">회원탈퇴</h4>
+
+                    <!-- 안내 -->
+                    <p class="mb-2">정말로 회원탈퇴를 진행하시겠습니까?</p>
+                    <p class="text-danger fw-semibold mb-4">
+                        탈퇴 시 계정 정보는 복구되지 않습니다.
+                    </p>
+
+                    <!-- form -->
+                    <form id="out-form">
+
+                        <div class="mb-3 text-start">
+                            <label class="form-label">비밀번호</label>
+                            <input type="password" class="form-control"
+                                id="user_pw" name="user_pw" placeholder="비밀번호 입력">
+                        </div>
+
+                        <!-- 버튼 -->
+                        <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                            회원탈퇴
+                        </button>
+
+                    </form>
+
+                    <!-- 구분선 -->
+                    <hr class="my-4">
+
+                    <!-- 하단 -->
+                    <div class="small">
+                        <p class="mb-0">
+                            계정을 유지하고 싶으신가요?
+                            <a th:href="@{/}" class="text-warning">돌아가기</a>
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        
+        <th:block th:replace="~{_fragments/footer :: my-footer}" />
+        <th:block th:replace="~{_fragments/_scripts :: my-scripts}" />
+        
+        <script>
+            document.querySelector("#out-form").addEventListener("submit", async(e)=>{
+                e.preventDefault();
+
+                try {
+                    regexHelper.value("#user_pw", "비밀번호를 입력하세요.");
+                } catch (error) {
+                    alert(error.message);
+                    error.element.focus();
+                    return;
+                }
+                
+                const result = confirm("정말 탈퇴하시겠습니까? 탈퇴 후에는 복구 할수 없습니다.")
+
+                if(result){
+                    try {
+                        await fetchHelper.delete("[[@{/api/account/out}]]", new FormData(e.currentTarget));
+                    } catch (error) {
+                        alert(error.message);
+                        error.element.focus();
+                        return;
+                    }
+
+                    alert("탈퇴가 완료되었습니다.");
+                    window.location ="[[@{/}]]";
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko" translate="no" xmlns:th="http://www.thymeleaf.org" >
+    <head>
+        <th:block th:replace="~{_fragments/_head :: my-head('Movie Review')}" />
+    </head>
+    <body class="bg-dark text-white">
+        <th:block th:replace="~{_fragments/header :: my-header}" />
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+
+            <form id="reset-form" class="w-100" style="max-width: 420px;">
+
+                <div class="bg-secondary p-4 rounded-4 shadow">
+
+                    <h3 class="text-center mb-4">비밀번호 재설정</h3>
+
+                    <!-- 숨겨진 토큰 -->
+                    <input type="hidden" id="token" name="token" th:value="${token}">
+
+                    <!-- 새 비밀번호 -->
+                    <div class="mb-3">
+                        <label class="form-label">새 비밀번호</label>
+                        <input type="password" class="form-control" id="new_pw" name="new_pw">
+                    </div>
+
+                    <!-- 확인 -->
+                    <div class="mb-3">
+                        <label class="form-label">비밀번호 확인</label>
+                        <input type="password" class="form-control" id="new_pw_confirm">
+                    </div>
+
+                    <!-- 버튼 -->
+                    <button type="submit" class="btn btn-warning w-100">
+                        비밀번호 변경
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+        <th:block th:replace="~{_fragments/footer :: my-footer}" />
+        <th:block th:replace="~{_fragments/_scripts :: my-scripts}" />
+        <script>
+        document.querySelector("#reset-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const token = document.querySelector("#token").value;
+            const pw = document.querySelector("#new_pw").value;
+            const pw2 = document.querySelector("#new_pw_confirm").value;
+
+            if (!pw || !pw2) {
+                alert("비밀번호를 입력하세요.");
+                return;
+            }
+
+            if (pw !== pw2) {
+                alert("비밀번호가 일치하지 않습니다.");
+                return;
+            }
+
+            try {
+                await fetchHelper.post("/api/account/reset_pw_confirm", {
+                    token: token,
+                    new_pw: pw
+                });
+            } catch (e) {
+                alert(e.message);
+                return;
+            }
+
+            alert("비밀번호가 변경되었습니다.");
+            window.location = "/account/login";
+        });
+        </script>
+
+        </body>
+</html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko" translate="no" xmlns:th="http://www.thymeleaf.org" >
+    <head>
+        <th:block th:replace="~{_fragments/_head :: my-head('Movie Review')}" />
+    </head>
+    <body class="bg-dark text-white">
+        <th:block th:replace="~{_fragments/header :: my-header}" />
+
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    
+            <form id="find-id-form" class="w-100" style="max-width: 420px;">
+                
+                <div class="bg-secondary p-4 rounded-4 shadow">
+
+                    <!-- 타이틀 -->
+                    <p class="fs-4 text-center mb-4 fw-bold">아이디 찾기</p>
+
+                    <!-- 안내 -->
+                    <p class="text-center small text-light mb-4">
+                        가입 시 입력한 이름과 이메일을 입력해주세요.
+                    </p>
+
+                    <!-- 이름 -->
+                    <div class="mb-3">
+                        <label class="form-label">이름</label>
+                        <input type="text" class="form-control" 
+                            id="user_name" name="user_name" placeholder="이름">
+                    </div>
+
+                    <!-- 이메일 -->
+                    <div class="mb-4">
+                        <label class="form-label">이메일</label>
+                        <input type="email" class="form-control" 
+                            id="email" name="email" placeholder="이메일">
+                    </div>
+
+                    <!-- 버튼 -->
+                    <button type="submit" class="btn btn-warning w-100 py-2 fw-bold">
+                        아이디 찾기
+                    </button>
+
+                    <!-- 결과 표시 영역 (추가 ⭐) -->
+                    <div id="result-box" class="mt-4 d-none">
+                        <div class="p-3 rounded-3 bg-dark text-center border border-secondary">
+                            
+                            <p class="mb-1">
+                                <span class="user-name fw-bold text-warning" id="find_name"></span>님의 아이디는
+                            </p>
+                            
+                            <p class="fs-5 fw-bold text-info mb-0">
+                                <span class="user-id" id="find_id"></span>
+                            </p>
+
+                        </div>
+                    </div>
+
+                    <!-- 구분선 -->
+                    <hr class="my-4">
+
+                    <!-- 하단 링크 -->
+                    <div class="text-center small">
+                        <p class="mb-2">
+                            계정이 없으신가요? 
+                            <a th:href="@{/account/join}" class="text-warning">회원가입</a>
+                        </p>
+                        <p class="mb-0">
+                            로그인이 필요하신가요?
+                            <a th:href="@{/account/login}" class="text-warning">로그인</a>
+                        </p>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+
+        <th:block th:replace="~{_fragments/footer :: my-footer}" />
+        <th:block th:replace="~{_fragments/_scripts :: my-scripts}" />
+        <script>
+            document.querySelector("#find-id-form").addEventListener("submit", async(e)=>{
+                e.preventDefault();
+
+                try {
+                    regexHelper.value("#user_name", "이름을 입력하세요.");
+                    regexHelper.value("#email", "이메일을 입력하세요.");
+                } catch (error) {
+                    alert(error.message);
+                    error.element.focus();
+                    return;
+                }
+                let json = null;
+                try {
+                  json =  await fetchHelper.post("[[@{/api/account/find_id}]]", new FormData(e.currentTarget));
+                } catch (error) {
+                    alert(error.message);
+                    error.element.focus();
+                    return;
+                }
+
+                console.log("json")
+                console.log(json)
+
+                const userName = document.querySelector("#user_name").value;
+                const userId = json.user_id;
+
+                document.querySelector("#find_name").innerText = userName;
+                document.querySelector("#find_id").innerText = userId;
+
+                document.querySelector("#result-box").classList.remove("d-none");
+
+            })
+        </script>
+    </body>
+</html>

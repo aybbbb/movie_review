@@ -1,0 +1,157 @@
+:root {
+    /* 색상 변수 */
+    --background-color: #f4f6f9;
+    --container-bg-color: #fff;
+    --box-shadow-color: rgba(0, 0, 0, 0.1);
+    --primary-color: #4caf50;
+    --primary-color-hover: #45a049;
+    --border-color: #ccc;
+    --text-color: #333;
+    --link-color: #4caf50;
+
+    /* 크기 및 패딩 변수 */
+    --container-padding: 40px;
+    --container-border-radius: 10px;
+    --input-padding: 12px;
+    --button-padding: 14px;
+    --border-radius-small: 4px;
+    --border-radius-large: 10px;
+    --gap-size: 20px;
+    --margin-bottom: 20px;
+
+    /* 글꼴 크기 변수 */
+    --font-size-base: 16px;
+    --font-size-heading: 24px;
+
+    /* 미디어 쿼리 */
+    --media-container-padding: 20px;
+}
+
+body {
+    background-color: var(--background-color);
+    padding-top: 60px;
+}
+
+#loader {
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.header {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--container-bg-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+
+    .header-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .header-right {
+            display: inline-flex;
+            align-items: center;
+
+            .auth-links a {
+                margin-left: 16px;
+                color: var(--text-color);
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+            .auth-links a:hover {
+                text-decoration: underline;
+            }
+
+            .profile-image {
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 8px;
+                vertical-align: middle;
+                transform: scale(8);
+                position: relative;
+                left: -10px;
+            }
+
+            .user-name {
+                font-size: 14px;
+                color: #0066ff;
+            }
+
+            .search-form {
+                display: flex;
+                align-items: center;
+                height: 30px;
+                margin-left: 20px;
+
+                input {
+                    width: 100%;
+                    box-sizing: border-box;
+                    padding: 0px 12px 0px 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    height: 100%;
+                }
+
+                button {
+                    margin-left: 8px;
+                    padding: 0 16px;
+                    background-color: #ff5252;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: background-color 0.2s ease;
+                    height: 100%;
+                    box-sizing: border-box;
+                    white-space: nowrap;
+                }
+            }
+        }
+    }
+}
+
+.footer {
+    width: 100%;
+    box-sizing: border-box;
+    border-top: 1px solid var(--border-color);
+    margin-top: 40px;
+    background-color: var(--container-bg-color);
+    padding: 40px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-color);
+
+    .footer-content {
+        max-width: 1400px;
+        margin: 0 auto;
+
+        p {
+            margin: 0 0 10px;
+        }
+    }
+}
