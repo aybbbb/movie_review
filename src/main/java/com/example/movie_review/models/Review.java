@@ -16,4 +16,5 @@ public class Review {
 
     String writer;
     float ratingAvg;
+    String movieGbn;
 }

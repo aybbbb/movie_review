@@ -1,5 +1,6 @@
 package com.example.movie_review.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.movie_review.models.MovieItem;
-import com.example.movie_review.models.MovieSearch;
+import com.example.movie_review.models.Movie;
+import com.example.movie_review.models.OmdbMovieSearch;
 import com.example.movie_review.models.Review;
 import com.example.movie_review.services.MovieReviewService;
 import com.example.movie_review.services.OmdbMovieService;
@@ -26,34 +27,79 @@ public class MainController {
     private final OmdbMovieService omdbMovieService;
     private final MovieReviewService movieReviewService;
 
-    @GetMapping("/")
+   @GetMapping({"/", "/{movie_gbn}"})
     public String mainPage(
-        Model model,
-        @RequestParam(value = "keyword", required = false) String keyword
-    ) throws Exception{
+            @PathVariable(value = "movie_gbn", required = false) String movie_gbn,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            Model model
+    ) throws Exception {
 
-        MovieSearch movieList;
-
-        if(keyword == null || keyword.trim().isEmpty() ){
-            movieList = omdbMovieService.getPopularMovies();
-        }else{
-            movieList = omdbMovieService.searchMovie(keyword);
+        // 기본값: omdb
+        if (movie_gbn == null || movie_gbn.isBlank()) {
+            movie_gbn = "omdb";
         }
 
-        model.addAttribute("movieList", movieList.getSearch());
-        model.addAttribute("keyword", keyword);
+        List<Movie> movieList;
 
+        // TMDb
+        if ("tmdb".equalsIgnoreCase(movie_gbn)) {
+            // 아직 구현 전
+             movieList = new ArrayList<>();
+            // if (keyword == null || keyword.trim().isEmpty()) {
+            //     movieList = tmdbMovieService.getPopularMovies();
+            // } else {
+            //     movieList = tmdbMovieService.searchMovie(keyword);
+            // }
+
+        // OMDb
+        } else {
+            movie_gbn = "omdb";
+
+            if (keyword == null || keyword.trim().isEmpty()) {
+                movieList = omdbMovieService.getPopularMovies();
+            } else {
+                movieList = omdbMovieService.searchMovie(keyword);
+            }
+        }
+
+        // 공통 데이터
+        model.addAttribute("movieList", movieList);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("movieGbn", movie_gbn);
+
+        // 기존 main.html 그대로 사용
         return "main";
     }
 
-    @GetMapping("/movie/detail/{imdbId}")
-    public String detailMovie( @PathVariable("imdbId") String imdbId, Model model)throws Exception {
+    @GetMapping("/movie/{movieGbn}/detail/{id}")
+    public String detailMovie( @PathVariable("movieGbn") String movie_gbn, @PathVariable("id") String id, Model model)throws Exception {
+        // 기본값: omdb
+        if (movie_gbn == null || movie_gbn.isBlank()) {
+            movie_gbn = "omdb";
+        }
 
-        MovieItem outMovie = omdbMovieService.getDetailItem(imdbId);
-        List<Review> reviewList = movieReviewService.movieReviews(imdbId);
-        float ratingAvg = movieReviewService.movieAvgRating(imdbId);
+        Movie outMovie;
+
+        // TMDb
+        if ("tmdb".equalsIgnoreCase(movie_gbn)) {
+            // 아직 구현 전
+             outMovie = null;
+            // if (keyword == null || keyword.trim().isEmpty()) {
+            //     movieList = tmdbMovieService.getPopularMovies();
+            // } else {
+            //     movieList = tmdbMovieService.searchMovie(keyword);
+            // }
+
+        // OMDb
+        } else {
+            outMovie = omdbMovieService.getDetailItem(id);
+        }
+        
+        List<Review> reviewList = movieReviewService.movieReviews(id,movie_gbn);
+        float ratingAvg = movieReviewService.movieAvgRating(id,movie_gbn);
 
         model.addAttribute("movie", outMovie);
+        model.addAttribute("movieGbn", movie_gbn);
         model.addAttribute("reviewList", reviewList);
         model.addAttribute("ratingAvg", ratingAvg);
 

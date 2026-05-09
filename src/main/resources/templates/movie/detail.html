@@ -91,7 +91,7 @@
 
             </div>
             <div class="text-center mt-4">
-                <a th:href="@{/}"  class="btn btn-sm btn-outline-light px-4">목록가기</a>
+                <a th:href="@{/{movieGbn}(movieGbn=${movieGbn})}"  class="btn btn-sm btn-outline-light px-4">목록가기</a>
             </div>
         </div>
        
@@ -179,6 +179,7 @@
                                 <input type="hidden" name="id" th:value="${review.id}">
                                 <input type="hidden" name="movie_id" th:value="${review.movieId}">
                                 <input type="hidden" name="mem_id" th:value="${review.memId}">
+                                <input type="hidden" name="movie_gbn" th:value="${movieGbn}">
 
                                 <!-- 새 사진 -->
                                 <div class="mb-3">
@@ -245,7 +246,8 @@
 
             <form id="enroll" enctype="multipart/form-data">
                 <input type="hidden" name ="mem_id" th:value="${session.memberInfo != null ? session.memberInfo.id : ''}">
-                <input type="hidden" name ="movie_id" th:value="${movie.imdbID}">
+                <input type="hidden" name="movie_id" th:value="${movie.movieId}">
+                <input type="hidden" name="movie_gbn" th:value="${movieGbn}">
                 <!-- 이미지 -->
                 <div class="mb-2">
                     <label class="form-label">인증샷</label>
@@ -306,14 +308,19 @@
         const stars = document.querySelectorAll(".star");
         const ratingInput = document.querySelector("#rating");
 
-        const movieId = /*[[${movie.imdbID}]]*/ "";
+        // movieId 공통 ID 사용 (OMDb: imdbID, TMDb: id)
+        const movieId = /*[[${movie.movieId}]]*/ "";
+        const movieGbn = /*[[${movieGbn}]]*/"";
         let isWished = false;
 
-        document.addEventListener("DOMContentLoaded",async function(){
-            const result = await fetchHelper.get(`/api/wishlist/is_wished?movie_id=${movieId}`);
-            isWished = result.isWished;   
-            console.log(isWished)
-            setWishButton(isWished);
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const result = await fetchHelper.get(`/api/wishlist/is_wished?movie_id=${movieId}&movie_gbn=#{movieGbn}`);
+                isWished = result.isWished;
+                setWishButton(isWished);
+            } catch (error) {
+                console.error(error);
+            }
         });
         
 
@@ -366,92 +373,92 @@
             }
         }
 
-        document.querySelector("#toggle-form").addEventListener("click", async(e)=>{
+        // 리뷰 작성 버튼
+        document.querySelector("#toggle-form").addEventListener("click", async (e) => {
             e.preventDefault();
 
             const isLogin = /*[[${session.memberInfo != null}]]*/ false;
 
-            // 로그인 안된 경우
             if (!isLogin) {
-
                 const currentUrl = window.location.pathname + window.location.search;
 
                 if (confirm("로그인이 필요합니다. 로그인 하시겠습니까?")) {
-                    window.location = '/account/login?redirect=' + encodeURIComponent(currentUrl);
+                    window.location =
+                        '/account/login?redirect=' + encodeURIComponent(currentUrl);
                 }
-
-                return; 
+                return;
             }
 
-            
-            let reviewId = 0
             try {
-                reviewId = await fetchHelper.get(`/api/movie/my?movie_id=${movieId}`);
+                const reviewId = await fetchHelper.get(
+                    `/api/movie/my?movie_id=${movieId}&movie_gbn=${movieGbn}`
+                );
 
-                // 이미 작성한 리뷰 있음 → 수정폼 이동
-                if (reviewId > 0 ) {
-                    if(confirm("이미 리뷰를 작성하셨습니다. 수정하시겠습니까?")){
-                        const targetForm = document.querySelector("#edit-form-" + reviewId);
+                // 이미 작성한 리뷰가 있으면 수정폼으로 이동
+                if (reviewId > 0) {
+                    if (confirm("이미 리뷰를 작성하셨습니다. 수정하시겠습니까?")) {
+                        const targetForm =
+                            document.querySelector("#edit-form-" + reviewId);
 
                         document.querySelectorAll(".edit-form").forEach(form => {
                             form.style.display = "none";
                         });
-                        targetForm.style.display = "block";
-                        targetForm.scrollIntoView({ behavior: "smooth", block: "center" });
 
-                        return;
+                        targetForm.style.display = "block";
+                        targetForm.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
                     }
+
+                    return;
                 }
 
-                // 리뷰 없으면 작성폼 열기
+                // 리뷰 없으면 작성폼 표시
                 document.querySelector("#review-list").style.display = "none";
                 document.querySelector("#review-form").style.display = "block";
+
             } catch (error) {
                 alert(error.message);
-                return;
             }
-
-            // 로그인된 경우 → 리뷰 작성 화면으로 전환
-            document.querySelector("#review-list").style.display = "none";
-            document.querySelector("#review-form").style.display = "block";
-            // await fetchHelper.get('/api/account/logout');
-
-            // window.location= '[[@{/}]]';
         });
 
-        // 위시리스트
-        document.querySelector("#wish-btn").addEventListener("click", async(e)=>{
+       // 위시리스트 토글
+        document.querySelector("#wish-btn").addEventListener("click", async (e) => {
+            e.preventDefault();
+
             const isLogin = /*[[${session.memberInfo != null}]]*/ false;
 
-            // 로그인 안된 경우
             if (!isLogin) {
-
                 const currentUrl = window.location.pathname + window.location.search;
 
                 if (confirm("로그인이 필요합니다. 로그인 하시겠습니까?")) {
-                    window.location = '/account/login?redirect=' + encodeURIComponent(currentUrl);
+                    window.location =
+                        "/account/login?redirect=" + encodeURIComponent(currentUrl);
                 }
-
-                return; 
+                return;
             }
 
             try {
-               let result;
-
                 if (isWished) {
                     if (!confirm("위시리스트에서 삭제하시겠습니까?")) return;
                 } else {
                     if (!confirm("위시리스트에 추가하시겠습니까?")) return;
                 }
 
-                result = await fetchHelper.put(`/api/wishlist/toggle?movie_id=${movieId}`);
+                await fetchHelper.put(
+                    `/api/wishlist/toggle?movie_id=${movieId}&movie_gbn=${movieGbn}`
+                );
 
-                isWished = result.toggleWish;   // 핵심
+                // 현재 상태를 직접 반전
+                isWished = !isWished;
+
+                // 즉시 UI 반영
                 setWishButton(isWished);
-    
+
             } catch (error) {
                 alert(error.message);
-                return;
+                console.error(error);
             }
         });
 

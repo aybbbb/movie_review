@@ -1,37 +1,49 @@
 package com.example.movie_review.helpers;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.movie_review.models.MovieItem;
-import com.example.movie_review.models.MovieSearch;
+import com.example.movie_review.models.OmdbMovieDetail;
+import com.example.movie_review.models.OmdbMovieSearch;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OmdbHelper {
-    
+
     private final RestTemplate restTemplate;
 
-    @Value("${omdb.api.key}") 
+    @Value("${omdb.api.key}")
     private String omdbKey;
-    @Value("${omdb.api.url}") 
+
+    @Value("${omdb.api.url}")
     private String omdbUrl;
 
-    public MovieSearch searchMovie(String keyword) {
+    /**
+     * 영화 검색
+     */
+    public OmdbMovieSearch searchMovie(String keyword) {
+
         String url = omdbUrl + "?apikey=" + omdbKey + "&s=" + keyword;
 
-        return restTemplate.getForObject(url, MovieSearch.class);
+        log.info("OMDb Search URL = {}", url);
+
+        return restTemplate.getForObject(url, OmdbMovieSearch.class);
     }
 
-    public MovieItem getMovieDetail(String imdbId) {
+    /**
+     * 영화 상세 조회
+     */
+    public OmdbMovieDetail getMovieDetail(String imdbId) {
 
-        String url = omdbUrl + "?apikey=" + omdbKey + "&i=" + imdbId;
+        String url = omdbUrl + "?apikey=" + omdbKey + "&i=" + imdbId + "&plot=full";
 
-        return restTemplate.getForObject(url, MovieItem.class);
+        log.info("OMDb Detail URL = {}", url);
+
+        return restTemplate.getForObject(url, OmdbMovieDetail.class);
     }
 }

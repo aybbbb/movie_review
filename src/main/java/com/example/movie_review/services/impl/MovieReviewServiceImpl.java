@@ -20,11 +20,11 @@ public class MovieReviewServiceImpl implements MovieReviewService{
     private final MovieReviewMapper movieReviewMapper;
 
     @Override
-    public List<Review> movieReviews(String movieId) throws Exception {
+    public List<Review> movieReviews(String movieId, String movieGbn) throws Exception {
 
         List<Review> output;
 
-        output = movieReviewMapper.moveiReiviewList(movieId);
+        output = movieReviewMapper.moveiReiviewList(movieId, movieGbn);
         
         return output;
     }
@@ -81,18 +81,18 @@ public class MovieReviewServiceImpl implements MovieReviewService{
 
 
     @Override
-    public float movieAvgRating(String movieId) throws Exception {
+    public float movieAvgRating(String movieId, String movieGbn) throws Exception {
 
-        return movieReviewMapper.selectRatingAvg(movieId);
+        return movieReviewMapper.selectRatingAvg(movieId, movieGbn);
     }
 
 
 
     @Override
-    public Integer myReviewId(String movieId, int memberId) throws Exception {
+    public Integer myReviewId(String movieId, int memberId, String movieGbn) throws Exception {
 
         Integer myReviewId = null;
-        myReviewId = movieReviewMapper.myReviewId(movieId, memberId);
+        myReviewId = movieReviewMapper.myReviewId(movieId, memberId,movieGbn);
 
        return myReviewId;
     }

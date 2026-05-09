@@ -8,12 +8,12 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface WishlistMapper {
     
-    @Select(" SELECT is_del From wishlist Where mem_id = #{memId} and movie_id = #{movieId} ")
-    public Integer getWishlistId(@Param("memId") int memId, @Param("movieId")  String movieId );
+    @Select(" SELECT is_del From wishlist Where mem_id = #{memId} and movie_id = #{movieId} and movie_gbn = #{movieGbn} ")
+    public Integer getWishlistId(@Param("memId") int memId, @Param("movieId")  String movieId, @Param("movieGbn")  String movieGbn );
 
-    @Insert(" INSERT INTO wishlist (mem_id, movie_id, is_del, reg_date, edit_date) " + 
-            " VALUES (#{memId}, #{movieId}, 0, NOW(), NOW()) " + 
+    @Insert(" INSERT INTO wishlist (mem_id, movie_id, is_del, reg_date, edit_date, movie_gbn) " + 
+            " VALUES (#{memId}, #{movieId}, 0, NOW(), NOW(), #{movieGbn}) " + 
             " ON DUPLICATE KEY " +
             " UPDATE  is_del = 1 - is_del , edit_date =NOW() ")
-    public int toggleWishlist(@Param("memId") int memId, @Param("movieId") String movieId);
+    public int toggleWishlist(@Param("memId") int memId, @Param("movieId") String movieId, @Param("movieGbn")  String movieGbn);
 }

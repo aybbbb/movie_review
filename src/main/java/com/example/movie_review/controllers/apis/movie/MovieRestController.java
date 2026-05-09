@@ -43,6 +43,7 @@ public class MovieRestController {
         @RequestParam("movie_id") String movieId, 
         @RequestParam("rating") int rating, 
         @RequestParam("text_review") String textReview, 
+        @RequestParam("movie_gbn") String movieGbn,
         @RequestParam(value = "photo_review", required = false) MultipartFile photo
         ) throws Exception{
         
@@ -61,6 +62,7 @@ public class MovieRestController {
         input.setMovieId(movieId);
         input.setRating(rating);
         input.setTextReview(textReview);
+        input.setMovieGbn(movieGbn);
 
         if(uploadItem != null){
             input.setPhotoReview(uploadItem.getFilePath());
@@ -68,7 +70,7 @@ public class MovieRestController {
         
         movieReviewService.insertMovieReview(input);
 
-        List<Review> reviewList = movieReviewService.movieReviews(movieId);
+        List<Review> reviewList = movieReviewService.movieReviews(movieId, movieGbn);
         
         Map<String, Object> result = new HashMap<>();
 
@@ -101,7 +103,8 @@ public class MovieRestController {
         @RequestParam("mem_id") int memId,
         @RequestParam("movie_id") String movieId, 
         @RequestParam("rating_upt") int rating, 
-        @RequestParam("text_review_upt") String textReview, 
+        @RequestParam("text_review_upt") String textReview,  
+        @RequestParam("movie_gbn") String movieGbn,
         @RequestParam(value = "photo_review_upt", required = false) MultipartFile photo,
         HttpSession session
         ) throws Exception{
@@ -127,6 +130,7 @@ public class MovieRestController {
         input.setMovieId(movieId);
         input.setRating(rating);
         input.setTextReview(textReview);
+        input.setMovieGbn(movieGbn);
 
         // 새 사진 업로드한 경우만 변경
         if (uploadItem != null) {
@@ -139,7 +143,7 @@ public class MovieRestController {
         
         movieReviewService.updateMovieReview(input,memberInfo.getId());
 
-        List<Review> reviewList = movieReviewService.movieReviews(movieId);
+        List<Review> reviewList = movieReviewService.movieReviews(movieId,movieGbn);
         
         Map<String, Object> result = new HashMap<>();
 
@@ -149,7 +153,7 @@ public class MovieRestController {
     }
 
     @GetMapping("/api/movie/my")
-    public Integer getMyReviewId( @RequestParam("movie_id") String movieId, HttpSession httpSession)throws Exception {
+    public Integer getMyReviewId( @RequestParam("movie_id") String movieId, @RequestParam("movie_gbn") String movieGbn, HttpSession httpSession)throws Exception {
 
         Member memberInfo = (Member) httpSession.getAttribute("memberInfo");
 
@@ -157,7 +161,7 @@ public class MovieRestController {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        Integer reviewId = movieReviewService.myReviewId(movieId, memberInfo.getId());
+        Integer reviewId = movieReviewService.myReviewId(movieId, memberInfo.getId(),movieGbn);
 
         return  reviewId != null ? reviewId : 0;
 

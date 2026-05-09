@@ -5,9 +5,9 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class MovieSearch {
+public class OmdbMovieSearch {
 
-    private List<MovieItem> Search;
+    private List<OmdbMovieDetail> Search;
     private String totalResults;
     private String Response;
     private String Error;

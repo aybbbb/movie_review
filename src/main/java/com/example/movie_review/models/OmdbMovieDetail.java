@@ -1,11 +1,13 @@
-
 package com.example.movie_review.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class MovieItem {
+public class OmdbMovieDetail {
+
+    private String movieGbn;
+    private String movieId;
 
     @JsonProperty("Title")
     private String title;

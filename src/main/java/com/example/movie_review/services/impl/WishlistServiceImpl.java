@@ -17,20 +17,20 @@ public class WishlistServiceImpl implements WishlistService {
     private final WishlistMapper wishlistMapper;
 
     @Override
-    public boolean getMyWishId(int memId, String movieId) throws Exception {
+    public boolean getMyWishId(int memId, String movieId, String movieGbn) throws Exception {
 
         Integer myWish = null;
-        myWish = wishlistMapper.getWishlistId(memId, movieId);
+        myWish = wishlistMapper.getWishlistId(memId, movieId,movieGbn);
 
         return  myWish != null && myWish == 0;
     }
 
     @Override
-    public boolean toggleWishlist(int memId, String movieId) throws Exception {
+    public boolean toggleWishlist(int memId, String movieId, String movieGbn) throws Exception {
        
-        wishlistMapper.toggleWishlist(memId, movieId);
+        wishlistMapper.toggleWishlist(memId, movieId,movieGbn);
 
-        Integer myWish = wishlistMapper.getWishlistId(memId, movieId);
+        Integer myWish = wishlistMapper.getWishlistId(memId, movieId,movieGbn);
 
         return myWish != null && myWish == 0;
     }
