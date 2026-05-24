@@ -10,4 +10,7 @@ public class Wishlist {
     private int isDel;
     private String regDate;
     private String editDate;
+
+    private String movieTitle;
+    private String moviePoster;
 }

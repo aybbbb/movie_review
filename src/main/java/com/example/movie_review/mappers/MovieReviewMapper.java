@@ -45,8 +45,8 @@ public interface MovieReviewMapper {
     @Select("SELECT IFNULL(ROUND(AVG(rating),1),0) AS ratingAvg FROM reviews WHERE movie_id =#{movieId} and movie_gbn =#{movieGbn} and is_del = 0")
     public float selectRatingAvg(@Param("movieId") String movieId,  @Param("movieGbn") String movieGbn);
 
-    @Insert("Insert into reviews (mem_id, movie_id, text_review, photo_review, rating, is_del, reg_date, edit_date, movie_gbn ) "+
-            "Values ( #{memId}, #{movieId}, #{textReview}, #{photoReview}, #{rating}, 0 , NOW(), NOW(), #{movieGbn} ) "
+    @Insert("Insert into reviews (mem_id, movie_id, text_review, photo_review, rating, is_del, reg_date, edit_date, movie_gbn, movie_title, movie_poster ) "+
+            "Values ( #{memId}, #{movieId}, #{textReview}, #{photoReview}, #{rating}, 0 , NOW(), NOW(), #{movieGbn}, #{movieTitle}, #{moviePoster}  ) "
     )
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     public int movieReviewInsrt(Review review);

@@ -26,9 +26,9 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    public boolean toggleWishlist(int memId, String movieId, String movieGbn) throws Exception {
+    public boolean toggleWishlist(int memId, String movieId, String movieGbn, String movieTitle, String moviePoster) throws Exception {
        
-        wishlistMapper.toggleWishlist(memId, movieId,movieGbn);
+        wishlistMapper.toggleWishlist(memId, movieId,movieGbn, movieTitle, moviePoster);
 
         Integer myWish = wishlistMapper.getWishlistId(memId, movieId,movieGbn);
 

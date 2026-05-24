@@ -12,11 +12,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.movie_review.models.Member;
 import com.example.movie_review.models.Movie;
 import com.example.movie_review.models.Review;
 import com.example.movie_review.services.MovieReviewService;
+import com.example.movie_review.services.MyMovieService;
 import com.example.movie_review.services.OmdbMovieService;
 import com.example.movie_review.services.TmdbMovieService;
+
+import jakarta.servlet.http.HttpSession;
 
 
 @Slf4j
@@ -27,6 +31,7 @@ public class MainController {
     private final OmdbMovieService omdbMovieService;
     private final TmdbMovieService tmdbMovieService;
     private final MovieReviewService movieReviewService;
+    private final MyMovieService myMovieService;
 
    @GetMapping({"/", "/{movie_gbn}"})
     public String mainPage(
@@ -38,12 +43,10 @@ public class MainController {
 
         // 기본값: omdb
         if (movie_gbn == null || movie_gbn.isBlank()) {
-            movie_gbn = "omdb";
+            movie_gbn = "tmdb";
         }
 
         List<Movie> movieList;
-
-        int totalPages = 1;
 
         // TMDb
         if ("tmdb".equalsIgnoreCase(movie_gbn)) {
@@ -70,6 +73,7 @@ public class MainController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("movieGbn", movie_gbn);
         model.addAttribute("page", page);
+        model.addAttribute("currentPage", movie_gbn);
 
         // 기존 main.html 그대로 사용
         return "main";
@@ -79,7 +83,7 @@ public class MainController {
     public String detailMovie( @PathVariable("movieGbn") String movie_gbn, @PathVariable("id") String id, Model model)throws Exception {
         // 기본값: omdb
         if (movie_gbn == null || movie_gbn.isBlank()) {
-            movie_gbn = "omdb";
+            movie_gbn = "tmdb";
         }
 
         Movie outMovie;
@@ -99,9 +103,36 @@ public class MainController {
         model.addAttribute("movieGbn", movie_gbn);
         model.addAttribute("reviewList", reviewList);
         model.addAttribute("ratingAvg", ratingAvg);
+        model.addAttribute("currentPage", movie_gbn);
 
         return "movie/detail";
 
+    }
+
+    @GetMapping("/my/review")
+    public String reviewPage(
+        HttpSession session,
+        @RequestParam(value = "keyword", required = false) String keyword,
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        Model model
+    ) throws Exception {
+
+       Member memberInfo =(Member) session.getAttribute("memberInfo");
+
+        if (memberInfo == null) {
+            return "redirect:/account/login";
+        }
+
+        List<Review> reviewList = myMovieService.myMoveiReivew(memberInfo.getUserId(), keyword);
+
+        // 공통 데이터
+        model.addAttribute("reviewList", reviewList);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("page", page);
+        model.addAttribute("currentPage", "myReview");
+
+        // 기존 main.html 그대로 사용
+        return "my/review";
     }
     
     

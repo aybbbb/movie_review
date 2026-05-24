@@ -44,6 +44,8 @@ public class MovieRestController {
         @RequestParam("rating") int rating, 
         @RequestParam("text_review") String textReview, 
         @RequestParam("movie_gbn") String movieGbn,
+        @RequestParam("movie_title") String movieTitle,
+        @RequestParam("movie_poster") String moviePoster,
         @RequestParam(value = "photo_review", required = false) MultipartFile photo
         ) throws Exception{
         
@@ -63,6 +65,8 @@ public class MovieRestController {
         input.setRating(rating);
         input.setTextReview(textReview);
         input.setMovieGbn(movieGbn);
+        input.setMovieTitle(movieTitle);
+        input.setMoviePoster(moviePoster);
 
         if(uploadItem != null){
             input.setPhotoReview(uploadItem.getFilePath());

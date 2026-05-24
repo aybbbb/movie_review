@@ -44,14 +44,19 @@ public class WishlistRestController {
     }
 
     @PutMapping("/api/wishlist/toggle")
-    public Map<String, Object> toggleWish(@RequestParam("movie_id") String movieId, @RequestParam("movie_gbn") String movieGbn, HttpSession httpSession) throws Exception {
+    public Map<String, Object> toggleWish(
+            @RequestParam("movie_id") String movieId,
+            @RequestParam("movie_gbn") String movieGbn,
+            @RequestParam("movie_title") String movieTitle,
+            @RequestParam("movie_poster") String moviePoster,
+            HttpSession httpSession) throws Exception {
         Member memberInfo = (Member) httpSession.getAttribute("memberInfo");
 
         if (memberInfo == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-       boolean isWished = wishlistService.toggleWishlist(memberInfo.getId(), movieId,movieGbn);
+       boolean isWished = wishlistService.toggleWishlist(memberInfo.getId(), movieId,movieGbn,movieTitle,moviePoster);
 
        Map<String, Object> result = new HashMap<>();
        result.put("toggleWish", isWished);

@@ -4,17 +4,21 @@ import lombok.Data;
 
 @Data
 public class Review {
-    int id;
-    int memId;
-    String movieId;
-    String textReview;
-    String photoReview;
-    int rating;
-    int isDel;
-    String regDate;
-    String editDate;
+    private int id;
+    private int memId;
+    private String movieId;
+    private String textReview;
+    private String photoReview;
+    private int rating;
+    private int isDel;
+    private String regDate;
+    private String editDate;
 
-    String writer;
-    float ratingAvg;
-    String movieGbn;
+    private String writer;
+    private float ratingAvg;
+    private String movieGbn;
+
+    private String movieTitle;
+    private String moviePoster;
+
 }

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko" translate="no" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{_fragments/_head :: my-head('Movie Review')}" />
+
+    <style>
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body class="bg-dark text-white">
+
+    <th:block th:replace="~{_fragments/header :: my-header}" />
+
+    <div class="container py-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">MY REVIEWS</h3>
+            <form method="get" th:action="@{/my/review}"  class="d-flex col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+                <input type="search" name="keyword" class="form-control form-control-dark" style="width: 180px;" th:value="${keyword}" placeholder="Search..." aria-label="Search">
+                <button type="submit" class="btn btn-warning fw-bold">검색</button>
+            </form>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-6 col-md-4 col-lg-3" th:each="review : ${reviewList}">
+                <a th:href="@{/movie/{movieGbn}/detail/{id}(movieGbn=${review.movieGbn},id=${review.movieId})}">
+                    
+                    <div class="card bg-dark text-white h-100">
+                        
+                        <img th:src="${review.moviePoster}" class="card-img-top">
+                        
+                        <div class="card-body">
+
+                            <span class="badge bg-warning text-dark"
+                                th:text="${review.movieGbn}">
+                            </span>
+
+                            <h5 th:text="${review.movieTitle}">
+                                제목
+                            </h5>
+
+                            <p th:text="${review.textReview}">
+                                리뷰내용
+                            </p>
+
+                            <div>
+                                ⭐<span th:text="${review.rating}"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+        <div class="text-center mt-5"  th:if="${reviewList != null and reviewList.size() >= 5}">
+            <button id="load-more-btn" class="btn btn-warning px-4">
+                더보기
+            </button>
+        </div>
+
+        <div class="text-center mt-5"
+             th:if="${reviewList == null or #lists.isEmpty(reviewList)}">
+
+            <h5 class="text-secondary">검색 결과가 없습니다.</h5>
+
+        </div>
+
+    </div>
+
+    <th:block th:replace="~{_fragments/footer :: my-footer}" />
+    <th:block th:replace="~{_fragments/_scripts :: my-scripts}" />
+    <script th:inline="javascript">
+        let page =1;
+
+        const movieGbn = /*[[${movieGbn}]]*/ "tmdb";
+        const keyword = /*[[${keyword}]]*/ "";
+
+        document.querySelector("#load-more-btn").addEventListener("click", async () => {
+            page++;
+
+            let url = `/${movieGbn}?page=${page}`;
+
+            if (keyword) {
+                url += `&keyword=${keyword}`;
+            }
+
+            const response = await fetch(url);
+            const html = await response.text();
+
+            // 받아온 HTML 파싱
+            const parser = new DOMParser();
+            const doc = parser.parseFromString( html,"text/html");
+
+            // 새 영화 카드들
+            const newMovies = doc.querySelectorAll("#movie-list > div");
+
+            // 기존 영역
+            const movieList = document.querySelector("#movie-list");
+
+            // append
+            newMovies.forEach(movie => {
+                movieList.appendChild(movie);
+            });
+        })
+    </script>
+</body>
+</html>

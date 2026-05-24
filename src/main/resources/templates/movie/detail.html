@@ -244,6 +244,8 @@
                 <input type="hidden" name ="mem_id" th:value="${session.memberInfo != null ? session.memberInfo.id : ''}">
                 <input type="hidden" name="movie_id" th:value="${movie.movieId}">
                 <input type="hidden" name="movie_gbn" th:value="${movieGbn}">
+                <input type="hidden" name="movie_title" th:value="${movie.title}">
+                <input type="hidden" name="movie_poster" th:value="${movie.poster}">
                 <!-- 이미지 -->
                 <div class="mb-2">
                     <label class="form-label">인증샷</label>
@@ -311,6 +313,8 @@
 
         const movieId = /*[[${movie.movieId}]]*/ "";
         const movieGbn = /*[[${movieGbn}]]*/ "";
+        const movieTitle = /*[[${movie.title}]]*/ "";
+        const moviePoster = /*[[${movie.poster}]]*/ "";
         const isLogin = /*[[${session.memberInfo != null}]]*/ false;
 
         let isWished = false;
@@ -480,7 +484,7 @@
                 if (!confirm(message)) return;
 
                 try {
-                    await fetchHelper.put(`/api/wishlist/toggle?movie_id=${movieId}&movie_gbn=${movieGbn}`);
+                    await fetchHelper.put(`/api/wishlist/toggle?movie_id=${movieId}&movie_gbn=${movieGbn}&movie_title=${movieTitle}&movie_poster=${moviePoster}`);
 
                     isWished = !isWished;
                     setWishButton();
