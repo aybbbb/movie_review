@@ -25,7 +25,7 @@
             <!-- 포스터 -->
             <div class="col-md-4">
                 <img th:src="${movie.poster != 'N/A' ? movie.poster : 'https://via.placeholder.com/400x600?text=No+Image'}"
-                     class="movie-poster shadow"  alt="영화 포스터">
+                     class="movie-poster shadow" style="max-height: 600px; width: 100%; object-fit: cover;" alt="영화 포스터">
             </div>
 
             <!-- 영화 정보 -->
@@ -75,11 +75,6 @@
                 <div class="mb-3">
                     <strong>개봉일</strong>
                     <p class="text-secondary mb-0" th:text="${movie.released}">01 Jan 2024</p>
-                </div>
-
-                <div class="mb-3">
-                    <strong>국가</strong>
-                    <p class="text-secondary mb-0" th:text="${movie.country}">USA</p>
                 </div>
 
                 <div class="mb-3">

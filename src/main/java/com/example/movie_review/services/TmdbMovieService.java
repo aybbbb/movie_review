@@ -3,9 +3,8 @@ package com.example.movie_review.services;
 import java.util.List;
 
 import com.example.movie_review.models.Movie;
-import com.example.movie_review.models.OmdbMovieSearch;
 
-public interface OmdbMovieService {
+public interface TmdbMovieService {
 
     public List<Movie> searchMovie(String keyword, int page) throws Exception;
     public List<Movie> getPopularMovies(int page) throws Exception ;

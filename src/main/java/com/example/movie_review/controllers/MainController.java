@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.movie_review.models.Movie;
-import com.example.movie_review.models.OmdbMovieSearch;
 import com.example.movie_review.models.Review;
 import com.example.movie_review.services.MovieReviewService;
 import com.example.movie_review.services.OmdbMovieService;
+import com.example.movie_review.services.TmdbMovieService;
 
 
 @Slf4j
@@ -25,12 +25,14 @@ import com.example.movie_review.services.OmdbMovieService;
 public class MainController {
 
     private final OmdbMovieService omdbMovieService;
+    private final TmdbMovieService tmdbMovieService;
     private final MovieReviewService movieReviewService;
 
    @GetMapping({"/", "/{movie_gbn}"})
     public String mainPage(
             @PathVariable(value = "movie_gbn", required = false) String movie_gbn,
             @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "page", defaultValue = "1") int page,
             Model model
     ) throws Exception {
 
@@ -41,24 +43,25 @@ public class MainController {
 
         List<Movie> movieList;
 
+        int totalPages = 1;
+
         // TMDb
         if ("tmdb".equalsIgnoreCase(movie_gbn)) {
-            // 아직 구현 전
-             movieList = new ArrayList<>();
-            // if (keyword == null || keyword.trim().isEmpty()) {
-            //     movieList = tmdbMovieService.getPopularMovies();
-            // } else {
-            //     movieList = tmdbMovieService.searchMovie(keyword);
-            // }
+            
+            if (keyword == null || keyword.trim().isEmpty()) {
+                movieList = tmdbMovieService.getPopularMovies(page);
+            } else {
+                movieList = tmdbMovieService.searchMovie(keyword, page);
+            }
 
         // OMDb
         } else {
             movie_gbn = "omdb";
 
             if (keyword == null || keyword.trim().isEmpty()) {
-                movieList = omdbMovieService.getPopularMovies();
+                movieList = omdbMovieService.getPopularMovies(page);
             } else {
-                movieList = omdbMovieService.searchMovie(keyword);
+                movieList = omdbMovieService.searchMovie(keyword, page);
             }
         }
 
@@ -66,6 +69,7 @@ public class MainController {
         model.addAttribute("movieList", movieList);
         model.addAttribute("keyword", keyword);
         model.addAttribute("movieGbn", movie_gbn);
+        model.addAttribute("page", page);
 
         // 기존 main.html 그대로 사용
         return "main";
@@ -82,14 +86,7 @@ public class MainController {
 
         // TMDb
         if ("tmdb".equalsIgnoreCase(movie_gbn)) {
-            // 아직 구현 전
-             outMovie = null;
-            // if (keyword == null || keyword.trim().isEmpty()) {
-            //     movieList = tmdbMovieService.getPopularMovies();
-            // } else {
-            //     movieList = tmdbMovieService.searchMovie(keyword);
-            // }
-
+            outMovie = tmdbMovieService.getDetailItem(id);
         // OMDb
         } else {
             outMovie = omdbMovieService.getDetailItem(id);

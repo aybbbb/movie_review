@@ -32,7 +32,7 @@
             </form>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-4"  id="movie-list">
 
             <div class="col-6 col-md-4 col-lg-3"
                  th:each="movie : ${movieList}">
@@ -69,7 +69,12 @@
                     </div>
                 </div>
             </div>
-
+            
+        </div>
+        <div class="text-center mt-5"  th:if="${movieList != null and movieList.size() >= 20}">
+            <button id="load-more-btn" class="btn btn-warning px-4">
+                더보기
+            </button>
         </div>
 
         <div class="text-center mt-5"
@@ -83,6 +88,39 @@
 
     <th:block th:replace="~{_fragments/footer :: my-footer}" />
     <th:block th:replace="~{_fragments/_scripts :: my-scripts}" />
+    <script th:inline="javascript">
+        let page =1;
 
+        const movieGbn = /*[[${movieGbn}]]*/ "tmdb";
+        const keyword = /*[[${keyword}]]*/ "";
+
+        document.querySelector("#load-more-btn").addEventListener("click", async () => {
+            page++;
+
+            let url = `/${movieGbn}?page=${page}`;
+
+            if (keyword) {
+                url += `&keyword=${keyword}`;
+            }
+
+            const response = await fetch(url);
+            const html = await response.text();
+
+            // 받아온 HTML 파싱
+            const parser = new DOMParser();
+            const doc = parser.parseFromString( html,"text/html");
+
+            // 새 영화 카드들
+            const newMovies = doc.querySelectorAll("#movie-list > div");
+
+            // 기존 영역
+            const movieList = document.querySelector("#movie-list");
+
+            // append
+            newMovies.forEach(movie => {
+                movieList.appendChild(movie);
+            });
+        })
+    </script>
 </body>
 </html>

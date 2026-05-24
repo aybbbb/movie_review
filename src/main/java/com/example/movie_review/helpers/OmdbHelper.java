@@ -26,9 +26,9 @@ public class OmdbHelper {
     /**
      * 영화 검색
      */
-    public OmdbMovieSearch searchMovie(String keyword) {
+    public OmdbMovieSearch searchMovie(String keyword, int page) {
 
-        String url = omdbUrl + "?apikey=" + omdbKey + "&s=" + keyword;
+        String url = omdbUrl + "?apikey=" + omdbKey + "&s=" + keyword  + "&page=" + page;;
 
         log.info("OMDb Search URL = {}", url);
 

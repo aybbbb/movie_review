@@ -23,11 +23,11 @@ public class OmdbMovieServiceImpl implements OmdbMovieService {
     private final OmdbHelper omdbHelper;
 
     @Override
-    public List<Movie> searchMovie(String keyword) throws Exception {
+    public List<Movie> searchMovie(String keyword, int page) throws Exception {
 
         log.info("영화 검색 keyword={}", keyword);
 
-        OmdbMovieSearch result = omdbHelper.searchMovie(keyword);
+        OmdbMovieSearch result = omdbHelper.searchMovie(keyword, page);
 
         List<Movie> movieList = new ArrayList<>();
 
@@ -41,7 +41,7 @@ public class OmdbMovieServiceImpl implements OmdbMovieService {
     }
 
     @Override
-    public List<Movie> getPopularMovies() throws Exception {
+    public List<Movie> getPopularMovies(int page) throws Exception {
         String[] popularKeywords = {
                 "marvel",
                 "batman",
@@ -57,7 +57,7 @@ public class OmdbMovieServiceImpl implements OmdbMovieService {
 
         log.info("기본 인기영화 keyword={}", keyword);
 
-        OmdbMovieSearch result = omdbHelper.searchMovie(keyword);
+        OmdbMovieSearch result = omdbHelper.searchMovie(keyword, page);
 
         List<Movie> movieList = new ArrayList<>();
 
